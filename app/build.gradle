@@ -1,0 +1,20 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.radargreen.watch'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.radargreen.watch'
+        minSdk 26
+        targetSdk 28
+        versionCode 4
+        versionName '2.2'
+    }
+    buildTypes {
+        release { minifyEnabled false }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
