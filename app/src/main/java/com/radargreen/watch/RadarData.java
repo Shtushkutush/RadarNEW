@@ -64,6 +64,10 @@ public final class RadarData implements SensorEventListener {
 
     public void refreshWeather() { weather.checkNow(); }
 
+    public String weatherCity() { return weather.city(); }
+
+    public void setWeatherCity(String city) { weather.setCity(city); }
+
     @Override public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() != Sensor.TYPE_STEP_COUNTER || event.values.length == 0) return;
         long total = (long) event.values[0];

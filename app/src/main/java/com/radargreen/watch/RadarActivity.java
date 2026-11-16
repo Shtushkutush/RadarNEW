@@ -1,9 +1,8 @@
 package com.radargreen.watch;
 
 import android.app.Activity;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.app.AlertDialog;
+import android.widget.EditText;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -35,15 +34,23 @@ public class RadarActivity extends Activity {
         setContentView(radarView);
         markInteraction();
         applyScreenBrightness(false);
-        if (Build.VERSION.SDK_INT >= 23 &&
-                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 22);
-        }
     }
 
-    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 22 && data != null) data.refreshWeather();
+    private void chooseCity() {
+        final EditText input = new EditText(this);
+        input.setSingleLine(true);
+        input.setText(data.weatherCity());
+        input.selectAll();
+        new AlertDialog.Builder(this)
+                .setTitle("Weather city / Город")
+                .setMessage("Введите город латиницей, например Kazan или Moscow")
+                .setView(input)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    data.setWeatherCity(input.getText().toString());
+                    markInteraction();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     @Override protected void onResume() {
@@ -101,7 +108,8 @@ public class RadarActivity extends Activity {
     private final class RadarView extends View {
         private final RadarRenderer radar = new RadarRenderer(data);
 
-        RadarView() { super(RadarActivity.this); setClickable(true); }
+        RadarView() { super(RadarActivity.this); setClickable(true); setLongClickable(true);
+            setOnLongClickListener(v -> { chooseCity(); return true; }); }
 
         @Override protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
@@ -114,7 +122,6 @@ public class RadarActivity extends Activity {
                 markInteraction();
                 removeCallbacks(frame);
                 post(frame);
-                return true;
             }
             return super.onTouchEvent(event);
         }
