@@ -12,7 +12,7 @@ public class RadarWallpaperService extends WallpaperService {
     @Override public Engine onCreateEngine() { return new RadarEngine(); }
 
     private class RadarEngine extends Engine {
-        private static final long AMBIENT_DELAY_MS = 15_000L;
+        private static final long AMBIENT_DELAY_MS = 30_000L;
         private static final long ACTIVE_FRAME_MS = 50L;
         private static final long AMBIENT_FRAME_MS = 1000L;
 

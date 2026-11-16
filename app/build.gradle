@@ -7,7 +7,7 @@ android {
         applicationId 'com.radargreen.watch'
         minSdk 26
         targetSdk 28
-        versionCode 5
+        versionCode 6
         versionName '2.3'
     }
     buildTypes {

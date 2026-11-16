@@ -149,7 +149,7 @@ public final class RadarRenderer {
     private void dot(Canvas canvas,float x,float y,float r,float pulse,boolean night,boolean ambient){
         float brightness = ambient
                 ? (night?.36f:.48f)
-                : (night?.55f:.84f)+(night?.12f:.32f)*pulse;
+                : (night?.55f:.84f)+(night?.19f:.42f)*pulse;
         paint.reset();paint.setAntiAlias(true);
         paint.setShader(new RadialGradient(x,y,r*(ambient?2.6f:3.5f),
            new int[]{rgba(101,217,140,(int)((ambient?52:102)*brightness)),rgba(49,145,76,(int)((ambient?18:38)*brightness)),Color.TRANSPARENT},
@@ -158,7 +158,7 @@ public final class RadarRenderer {
         paint.setColor(rgba(143,234,162,(int)((ambient?150:215)*brightness)));
         canvas.drawCircle(x,y,r,paint);
         if(!ambient && pulse>.05f){
-            ringAt(canvas,x,y,r+3+8*(1-pulse),rgba(84,185,112,(int)((night?28:50)*pulse)),.65f);
+            ringAt(canvas,x,y,r+3+8*(1-pulse),rgba(84,185,112,(int)((night?34:65)*pulse)),.65f);
         }
     }
 

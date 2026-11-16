@@ -11,7 +11,8 @@ import android.view.View;
 import android.view.WindowManager;
 
 public class RadarActivity extends Activity {
-    private static final long AMBIENT_DELAY_MS = 15_000L;
+    private static final long AMBIENT_DELAY_MS = 30_000L;
+    private static final long RELEASE_SCREEN_MS = 60_000L;
     private static final long ACTIVE_FRAME_MS = 50L;   // ~20 FPS
     private static final long AMBIENT_FRAME_MS = 1000L; // update time/BAT once per second
     private static final float AMBIENT_SCREEN_BRIGHTNESS = 0.035f; // requested window brightness, device may clamp
@@ -19,6 +20,7 @@ public class RadarActivity extends Activity {
     private RadarView radarView;
     private RadarData data;
     private boolean ambientMode;
+    private boolean screenHoldActive;
     private long lastInteraction;
 
     @Override public void onCreate(Bundle state) {
@@ -28,7 +30,7 @@ public class RadarActivity extends Activity {
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         // Keep the physical display on while this activity is foregrounded.
         // Without this flag the radar merely dims its drawing and Android still sleeps.
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setScreenHold(true);
         data = new RadarData(this);
         radarView = new RadarView();
         setContentView(radarView);
@@ -65,12 +67,14 @@ public class RadarActivity extends Activity {
     @Override protected void onPause() {
         radarView.removeCallbacks(frame);
         data.stop();
+        setScreenHold(false);
         applyScreenBrightness(false);
         super.onPause();
     }
 
     private void markInteraction() {
         lastInteraction = SystemClock.elapsedRealtime();
+        setScreenHold(true);
         if (ambientMode) {
             ambientMode = false;
             applyScreenBrightness(false);
@@ -85,6 +89,17 @@ public class RadarActivity extends Activity {
             ambientMode = nextMode;
             applyScreenBrightness(ambientMode);
         }
+        // Standard Android applications cannot force the display to sleep
+        // reliably without device-admin privileges. Release our screen hold
+        // at 60s and allow the watch's configured timeout to switch it off.
+        setScreenHold(idle < RELEASE_SCREEN_MS);
+    }
+
+    private void setScreenHold(boolean hold) {
+        if (hold == screenHoldActive) return;
+        screenHoldActive = hold;
+        if (hold) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void applyScreenBrightness(boolean ambient) {
